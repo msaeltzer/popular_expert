@@ -21,7 +21,6 @@ df<-read.csv("https://raw.githubusercontent.com/msaeltzer/popular_expert/master/
 df<-df[,-1]
 var<-read.csv("https://raw.githubusercontent.com/msaeltzer/popular_expert/master/vars.csv",header=F,stringsAsFactors = F,sep="\t")
 
-
 df$country_id <- to_factor(df$country_id)
 
 df$party_id <- to_label(df$party_id)
