@@ -38,32 +38,36 @@ levels(df$family) <- c("Radical Right", "Conservatives", "Liberal", "Christian D
                        "Regionalist", "No Family", "Confessional", "Agrarian/ Center")
 
 
+## change the names of the variables
 
-## Each shiny app needs a user interface and a server
-
-# user interface
 names(df)[1]<-"Country"
 names(df)[6]<-"Party_Family"
 
 names(df)[c(9:24,27)]<-paste(toupper(names(df)[c(9:24,27)]),"-",var$V2)
-PAGE_TITLE<-"Expert Survey on Populism"
 
 # we create a page with tabs: navbar page
+
 ui_full<-navbarPage(
-  ## the html tag looks like this...how can I change?
-  title = div(
-    div(
-      id = "img-id",
-      img(src = "http://poppa-data.eu/wp-content/uploads/2019/07/cropped-mediumsmall-res-3.png",                   
-          height = 60,
-          width = 120,
-          style = "margin:7px 10px"
-      ),
-    "Populism and Political Parties Expert Survey 2018"  
-    ),
-  ),
   
+# Top Layout
+    
+  # html text for the page 
+      windowTitle = "Poppa - Populism and Political Parties Expert Survey",   
+
+      #add a picture  
+        title = div(
+          div(
+            id = "img-id",
+            img(src = "http://poppa-data.eu/wp-content/uploads/2019/07/cropped-mediumsmall-res-3.png",                   
+                height = 60,
+                width = 120,
+                style = "margin:7px 10px"
+            ),
+          "Populism and Political Parties Expert Survey 2018"  
+          ),
+        ),
   
+          # tab panels!
            
                     tabPanel("Scatterplot",                        # we begin a tab
                     
@@ -96,6 +100,8 @@ ui_full<-navbarPage(
            ), # end tab
            
            tabPanel("Barplot",    # new tab
+                    titlePanel("             "),    # give it a title
+                    
                     sidebarLayout( # again, sidebar layout
                       
                       sidebarPanel( # control panel
@@ -116,27 +122,32 @@ ui_full<-navbarPage(
                  ) # end layout
               
             ),  # end tab
-        
-tabPanel("Information",
- 
-         h3("The Authors"),
-         p(a("Maurits J. Meijers",href="http://maurits-meijers.eu/"),
-         span("is an assistant professor in political science at Radboud University.")),
+                
+        tabPanel("Information",
          
-         p(a("Andrej Zaslove",href="https://www.ru.nl/english/people/zaslove-a/"),
-         span("is an associate professor in political science at Radboud University.")),
-         
-         p(span("Please feel free to access "),
-         a("the data",href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/8NEL7B"),
-         span("and the"),
-         a("corresponding paper",href="http://maurits-meijers.eu/wp-content/uploads/2020/04/Meijers_Zaslove_2020_CPS_preprint.pdf"))
-)           
-           
+              h3("The Authors"),
+              
+                 p(
+                   a("Maurits J. Meijers",href="http://maurits-meijers.eu/"),
+                   span("is an assistant professor in political science at Radboud University.")
+                  ),
+                 
+                 p(
+                   a("Andrej Zaslove",href="https://www.ru.nl/english/people/zaslove-a/"),
+                 span("is an associate professor in political science at Radboud University.")
+                  ),
+                 
+                 p(
+                   span("Please feel free to access "),
+                   a("the data",href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/8NEL7B"),
+                   span("and the"),
+                   a("corresponding paper",href="http://maurits-meijers.eu/wp-content/uploads/2020/04/Meijers_Zaslove_2020_CPS_preprint.pdf")
+                   )
+    
+              ) # end tab panel          
+                 
     ) # end UI
   
-
-input$scale1<-names(df)[27]
-
 # we define what the server returns for input
 server_full <- function(input, output) {
   
@@ -158,35 +169,41 @@ server_full <- function(input, output) {
 
     #plot tab 2
               output$scatter<-renderPlotly({
-                tit1<-strsplit(input$scale1,"-")[[1]][1]
+                tit1<-strsplit(input$scale1,"-")[[1]][1] # only use the first term of the scale title
                 tit2<-strsplit(input$scale2,"-")[[1]][1]
+                                                                                                                  # add duplication for 1. the text BOXES and 2. the on/off      
                 d <- data.frame(x = find(df,input$scale1), y = find(df,input$scale2), Country = as.character(df$Country),Coun = as.character(df$Country), Party_family = df$Party_Family,Party_name=df$party,Pname=df$party)
                  
+                # on/off party
                  if(input$pname==F){
                  d$Pname <- ""
                }
-                
+                # on/off country
                 if(input$cname==F){
                   d$Coun <- ""
                 }
+                
+                # select Country
                 if(input$country!="All"){
                 dd<-subset(d,Country==input$country)}else{dd<-d}
                 
-            
-                 
+                # define colors          
                pals <- c('brown','black','gold1','blue','red','dark red','green','dark blue',"grey","purple","dark green")
                pals <- setNames(pals, levels(df$family))
-                f <- list(
+               
+               # define characteristics of text axis labels
+               f <- list(
                   size = 18,
                   color = "#7f7f7f"
                 )
                 xlab <- list(title = trimws(tit1), titlefont = f)
                 ylab <- list(title = trimws(tit2), titlefont = f)            
+               # begin plotly figure
                 fig <- plot_ly(
                   dd, x = ~x, y = ~ y, color = ~ Party_family, text = ~ Party_name, colors = pals
                 ) %>% add_markers() %>% layout(xaxis = xlab, yaxis = ylab) %>% add_text(text = ~ Coun, textposition = "top right", showlegend = F) %>% add_text(text = ~ Pname, textposition = "top right", showlegend = F)})         
  
-          }
+          } # end server
 
-
+# run App
 shinyApp(ui=ui_full,server=server_full)
