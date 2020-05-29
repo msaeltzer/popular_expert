@@ -19,7 +19,7 @@ input$country2<-"AU"
 
 df<-read.csv("https://www.dropbox.com/s/sce8ktvvzws3jhy/party_means.csv?dl=1")
 df<-df[,-1]
-var<-read.csv("vars.csv",header=F,stringsAsFactors = F)
+var<-read.csv("https://raw.githubusercontent.com/msaeltzer/popular_expert/master/vars.csv?token=ALLNVVU2YFTT34BFUT7XTPK62F6XE",header=F,stringsAsFactors = F)
 
 
 df$country_id <- to_factor(df$country_id)
