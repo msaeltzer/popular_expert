@@ -6,6 +6,13 @@ library(sjmisc)
 library(sjlabelled)
 library(plotly)
 
+
+# to do: 
+  # fill disclaimers
+  # test on other devices
+  # fix the html tags
+  # add features to barplot?
+
 find<-function(df,x){df[,which(names(df)==x)]}
 
 ## test functions
@@ -43,7 +50,7 @@ PAGE_TITLE<-"Expert Survey on Populism"
 
 # we create a page with tabs: navbar page
 ui_full<-navbarPage(
-  
+  ## the html tag looks like this...how can I change?
   title = div(
     div(
       id = "img-id",
