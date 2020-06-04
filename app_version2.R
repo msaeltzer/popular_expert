@@ -44,6 +44,8 @@ names(df)[c(9:24,27)]<-paste(toupper(names(df)[c(9:24,27)]),"-",var$V3)
 
 df<-df[,c(1:8,27,16:24,14:15,9:13,25:26)]
 
+
+
 # we create a page with tabs: navbar page
 
 ui_full<-navbarPage(
@@ -80,19 +82,19 @@ ui_full<-navbarPage(
                         selectInput('scale1', 'X-Axis', names(df)[c(9:25)],selected=names(df)[27]),
                         selectInput('scale2', 'Y-Axis', names(df)[c(9:25)],selected=names(df)[24])
                         ,checkboxInput('pname', 'Party',value=F)
-                        ,checkboxInput('cname', 'Country',value=F)
-                        ,selectInput('country', 'Select Country',c("All",levels(df$Country))
-                        ,textOutput("scale1t")
-                        #,textOutput("scale2t")
+                      #  ,checkboxInput('cname', 'Country',value=F)
+                        ,checkboxGroupInput('country', 'Select Country', choices = c("All",levels(df$Country)), selected = "All")
+                        
+                        
                         
                                      #                 
-                                     )
+                                     ),
                         
-                        ),
+                
                       
                       mainPanel(                              # plot panel
                         plotlyOutput("scatter")
-                        ) 
+                      ) 
                       
                  ) # end layout
               
@@ -141,14 +143,10 @@ server_full <- function(input, output) {
                  if(input$pname==F){
                  d$Pname <- ""
                }
-                # on/off country
-                if(input$cname==F){
-                  d$Coun <- ""
-                }
                 
                 # select Country
-                if(input$country!="All"){
-                dd<-subset(d,Country==input$country)}else{dd<-d}
+               if(!"All" %in% input$country){
+                dd<-subset(d,Country%in%input$country)}else{dd<-d}
                 
                pals<-brewer.pal(9,"Paired")
                  
@@ -161,10 +159,10 @@ server_full <- function(input, output) {
                 ylab <- list(title = trimws(tit2), titlefont = f)            
                # begin plotly figure
                 fig <- plot_ly(
-                  dd, x = ~x, y = ~ y, color = ~ Party_family, text = ~ Party_name, colors=pals
-                ) %>% add_markers() %>% layout(xaxis = list(range=c(0,10))) %>% layout(yaxis = list(range=c(0,10))) %>% layout(xaxis = xlab, yaxis = ylab) %>% layout(plot_bgcolor='#f2f2f2') %>% add_text(text = ~ Coun, textposition = "top right", showlegend = F) %>% add_text(text = ~ Pname, textposition = "top right", showlegend = F)})         
- 
+                  dd, x = ~x, y = ~ y, color = ~ Party_family, text = ~ Party_name, colors=pals, height = 700, width = 900
+                ) %>% add_markers() %>% layout(xaxis = list(range=c(0,10))) %>% layout(yaxis = list(range=c(0,10))) %>% layout(xaxis = xlab, yaxis = ylab) %>% layout(plot_bgcolor='#f2f2f2') %>% add_text(text = ~ Pname, textposition = "top right", showlegend = F) %>%  layout(margin = list(b=160),annotations = list(x = 1, y = .01,text="Source: Populism and Political Parties Expert Survey, www.poppa-data.eu",showarrow=F, xref='paper', yref='paper', 
+                                                                                                                                                                                                                                                                                                                           xanchor='right', yanchor='auto', xshift=0, yshift=0,font=list(size=10)))
+                })         
           } # end server
-
 # run App
 shinyApp(ui=ui_full,server=server_full)
