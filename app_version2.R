@@ -168,8 +168,9 @@ server_full <- function(input, output) {
                if(!"All" %in% input$country){
                 dd<-subset(d,Country%in%input$country)}else{dd<-d}
                 
-               pals<-brewer.pal(9,"Paired")
+               pals<-brewer.pal(11,"Paired")
                  
+      pals<-pals[c(2,1,11,7,5,6,4,10,9,8,3)]
                # define characteristics of text axis labels
                f <- list(
                   size = 18,
